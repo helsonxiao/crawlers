@@ -15,7 +15,7 @@ DOWNLOAD_URL = "https://movie.douban.com/top250"
 def download_page(url):
     # 添加 U-A 信息，以防反爬
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36'
     }
     data = requests.get(url, headers=headers).content
     return data
