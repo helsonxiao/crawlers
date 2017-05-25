@@ -1,12 +1,14 @@
 #! python3
 # coding:utf-8
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals  # todo
 import logging
 import os
 import re
 import time
+# https://docs.python.org/3/library/urllib.parse.html
 from urllib.parse import urlparse
+# https://pypi.python.org/pypi/pdfkit
 import pdfkit
 import requests
 from bs4 import BeautifulSoup
@@ -21,7 +23,6 @@ html_template = """
 {content}
 </body>
 </html>
-
 """
 
 class Crawler(object):
@@ -38,8 +39,8 @@ class Crawler(object):
         """
         self.name = name
         self.start_url = start_url
-        # what is it?
-        self.domain = '{uri.scheme}://{uri.netloc}'.format(uri=urlparse(self.start_url))
+        # 解析 url 并且生成域名
+        self.domain = '{u.scheme}://{u.netloc}'.format(u=urlparse(self.start_url))
 
     def crawl(self, url):
         print(url)
@@ -60,6 +61,9 @@ class Crawler(object):
         :param response: 爬虫返回的 response 对象
         :return: 返回经过处理的 HTML 文本
         """
+        # In user defined base classes,
+        # abstract methods should raise this exception when they require derived classes to override the method,
+        # or while the class is being developed to indicate that the real implementation still needs to be added.
         raise NotImplementedError
 
     def run(self):
@@ -72,7 +76,7 @@ class Crawler(object):
             'margin-left': '0.75in',
             'encoding': "UTF-8",
             'custom-header': [
-                ('Accept-Encoding', 'gzip')  # what is it?
+                ('Accept-Encoding', 'gzip')  # gzip - A compression format
             ],
             'cookie': [
                 ('cookie-name1', 'cookie-value1'),
@@ -89,7 +93,7 @@ class Crawler(object):
             htmls.append(f_name)
 
         pdfkit.from_file(htmls, self.name + ".pdf", options=options)
-        for html in htmls:
+        for html in htmls:  # todo
             os.remove(html)
         total_time = time.time() - start
         print("总共耗时：[s]".format(total_time))
@@ -110,8 +114,8 @@ class LiaoxuefengPythonCrawler(Crawler):
         for li in menu_tag.find_all("li"):
             url = li.a.get("href")
             if not url.startswith("http"):
-                url = "".join([self.domain, url])  # 补全为全路径
-            yield url
+                url = "".join([self.domain, url])  # 补全 url
+            yield url  # generator - 惰性运行
 
     def parse_body(self, response):
         """
@@ -119,7 +123,6 @@ class LiaoxuefengPythonCrawler(Crawler):
         :param response: 爬虫返回的response对象
         :return: 返回处理后的html文本
         """
-        global html_templete
         try:
             soup = BeautifulSoup(response.content, 'html.parser')
             body = soup.find_all(class_="x-wiki-content")[0]
@@ -136,15 +139,15 @@ class LiaoxuefengPythonCrawler(Crawler):
             # body中的img标签的src相对路径的改成绝对路径
             pattern = "(<img .*?src=\")(.*?)(\")"
 
-            def func(m):
+            def func(ht):
 
-                if not m.group(3).startswith("http"):
-                    rtn = "".join([m.group(1), self.domain, m.group(2), m.group(3)])
-                    return rtn
+                if not ht.group(3).startswith("http"):
+                    url_form = "".join([ht.group(1), self.domain, ht.group(2), ht.group(3)])
+                    return url_form
                 else:
-                    return "".join([m.group(1), m.group(2), m.group(3)])
+                    return "".join([ht.group(1), ht.group(2), ht.group(3)])
 
-            html = re.compile(pattern).sub(func, html)
+            html = re.compile(pattern).sub(func, html)  # 将 正则表达式 编译成 pattern 对象
             html = html_template.format(content=html)
             html = html.encode("utf-8")
             return html
