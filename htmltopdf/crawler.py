@@ -43,7 +43,7 @@ class Crawler(object):
         self.domain = '{u.scheme}://{u.netloc}'.format(u=urlparse(self.start_url))
 
     def crawl(self, url):
-        print(url)
+        print("努力爬取中...")
         response = requests.get(url)
         return response
 
@@ -92,11 +92,15 @@ class Crawler(object):
                 f.write(html)
             htmls.append(f_name)
 
-        pdfkit.from_file(htmls, self.name + ".pdf", options=options)
-        for html in htmls:  # todo
-            os.remove(html)
-        total_time = time.time() - start
-        print("总共耗时：[s]".format(total_time))
+        try:
+            pdfkit.from_file(htmls, self.name + ".pdf", options=options)
+        except:
+            pass
+        finally:
+            for f_name in htmls:
+                os.remove(f_name)
+            total_time = time.time() - start
+            print("总共耗时：{:f}".format(total_time))
 
 class LiaoxuefengPythonCrawler(Crawler):
     """
@@ -137,15 +141,16 @@ class LiaoxuefengPythonCrawler(Crawler):
 
             html = str(body)
             # body中的img标签的src相对路径的改成绝对路径
-            pattern = "(<img .*?src=\")(.*?)(\")"
+            pattern = "(<img .*?src=\")(.*?)(\")"  # 正则表达式分为 4 部分 - 0 完全匹配，123 分别对应括号内容
 
+            # 将匹配到的内容 group 重组格式
             def func(ht):
-
-                if not ht.group(3).startswith("http"):
-                    url_form = "".join([ht.group(1), self.domain, ht.group(2), ht.group(3)])
-                    return url_form
+                if not ht.group(2).startswith("http"):  # 无绝对路径则添加域名
+                    full_url = "".join([ht.group(1), self.domain, ht.group(2), ht.group(3)])
+                    return full_url
                 else:
-                    return "".join([ht.group(1), ht.group(2), ht.group(3)])
+                    return ht.group(0)  # 有绝对路径则返回自身
+                    # return "".join([ht.group(1), ht.group(2), ht.group(3)])
 
             html = re.compile(pattern).sub(func, html)  # 将 正则表达式 编译成 pattern 对象
             html = html_template.format(content=html)

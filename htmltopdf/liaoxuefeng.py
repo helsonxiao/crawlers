@@ -29,8 +29,6 @@ def save_pdf(htmls):
             ('Accept-Encoding', 'gzip')
     ]
     }
-    start_time = time.time()
-    print(str(start_time))
     pdfkit.from_file(htmls, "liao.pdf", options=options)
 
 urls = get_url_list()
@@ -43,6 +41,9 @@ for index, url in enumerate(urls):
         f.write(html)
     htmls.append(h_name)
 
-save_pdf(htmls)
+try:
+    save_pdf(htmls)
+except:
+    pass
 for html in htmls:
     os.remove(html)
