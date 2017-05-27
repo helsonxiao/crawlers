@@ -7,7 +7,10 @@ import os
 import re
 import time
 # https://docs.python.org/3/library/urllib.parse.html
-from urllib.parse import urlparse
+try:
+    from urllib.parse import urlparse  # py3
+except:
+    from urlparse import urlparse  # py2
 # https://pypi.python.org/pypi/pdfkit
 import pdfkit
 import requests
