@@ -6,11 +6,10 @@ import logging
 import os
 import re
 import time
+
 # https://docs.python.org/3/library/urllib.parse.html
-try:
-    from urllib.parse import urlparse  # py3
-except:
-    from urlparse import urlparse  # py2
+from urllib.parse import urlparse  # py3
+
 # https://pypi.python.org/pypi/pdfkit
 import pdfkit
 import requests
@@ -164,6 +163,7 @@ class LiaoxuefengPythonCrawler(Crawler):
 
 
 if __name__ == '__main__':
+    # start_url = "http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000"
     start_url = "http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000"
     crawler = LiaoxuefengPythonCrawler("廖雪峰Git", start_url)
     crawler.run()
