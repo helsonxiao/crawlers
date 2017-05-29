@@ -14,7 +14,7 @@ headers = {
     }
 
 def get_html(index):
-    url = r'https://www.pengfu.com/index_%d.html' % index
+    url = 'https://www.pengfu.com/index_%d.html' % index
     html = requests.get(url, headers=headers).content
     # html = urllib.urlopen(url).read()
     return html
@@ -27,7 +27,7 @@ def get_blocks(html):
 def get_title(block):
     h1 = block.find('h1')
     pattern = r'<h1 class="dp-b"><a href=".*?" target="_blank">(.*?)</a>'
-    title = re.findall(pattern, str(h1))
+    title = re.compile(pattern).findall(str(h1))
     return title
 
 def get_pic(block):
@@ -35,8 +35,8 @@ def get_pic(block):
     gif_pattern = r'gifsrc="(.*?)"'
     jpg_pattern = r'<img .*? jpgsrc="(.*?)" src=".*?" .*?/>'
     # 如何用一条语句匹配 gif & jpg ? todo
-    gif_pic = re.findall(gif_pattern, str(img))
-    jpg_pic = re.findall(jpg_pattern, str(img))
+    gif_pic = re.compile(gif_pattern).findall(str(img))
+    jpg_pic = re.compile(jpg_pattern).findall(str(img))
     if gif_pic:
         return gif_pic
     else:
