@@ -34,7 +34,6 @@ def get_pic(block):
     img = block.find_all('img')[1]
     gif_pattern = r'gifsrc="(.*?)"'
     jpg_pattern = r'<img .*? jpgsrc="(.*?)" src=".*?" .*?/>'
-    # 如何用一条语句匹配 gif & jpg ? todo
     gif_pic = re.compile(gif_pattern).findall(str(img))
     jpg_pic = re.compile(jpg_pattern).findall(str(img))
     if gif_pic:
